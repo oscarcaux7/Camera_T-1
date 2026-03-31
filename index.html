@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera T-1 - Fog of Time</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=9">
+    <!-- Google Fonts for moodboard typography -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Left Panel: Info & UI -->
+        <div class="left-panel retro-window">
+            <div class="retro-header">
+                <div class="retro-square"></div>
+                <div class="retro-lines"></div>
+            </div>
+            <div class="retro-content d-flex-col">
+
+                <div class="branding">
+                    <h1>Camera T-1</h1>
+                    <p class="subtitle">How to break the "Temporal Frame" ?</p>
+                </div>
+
+                <div class="stats-section">
+                    <h3>What is this device ?</h3>
+                    <p>This project invites you to explore the world around you from a different perspective : <span
+                            class="underline">through time.</span></p>
+                    <p>Using this camera, you can rediscover past photographs of your current location. These archival
+                        images serve as <span class="underline">windows into the lives of those who came before
+                            us</span>, offering a glimpse into how they saw and experienced the world.</p>
+                </div>
+
+                <div class="stats-counter">
+                    <p><strong>Archives Found:</strong> <span id="archive-count">0</span></p>
+                </div>
+
+                <div class="achievements-section">
+                    <h3>Narrative Badges :</h3>
+                    <ul id="badges-list">
+                        <li class="badge locked" id="badge-flaneur" style="cursor: pointer;">The Flâneur</li>
+                        <li class="badge locked" id="badge-timetraveler" style="cursor: pointer;">Time Traveler</li>
+                        <li class="badge locked" id="badge-ghosts" style="cursor: pointer;">Ghosts of the Past</li>
+                    </ul>
+                    <div id="badge-description" class="hidden"
+                        style="margin-top: 15px; padding: 10px; border: 2px solid #111; background: #e9e5db; font-weight: bold; font-family: 'Space Mono', monospace; font-size: 0.9rem;">
+                    </div>
+                </div>
+
+                <div class="controls-section mt-auto">
+                    <button class="retro-btn" id="btn-simulate">Simulate Discovery</button>
+                    <button class="retro-btn mt-small" id="btn-open-gallery">View Database</button>
+                    <button class="retro-btn mt-small" id="btn-open-history">Discovery History</button>
+                    <button class="retro-btn mt-small" id="btn-open-overview">Project Overview</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Panel: The Map -->
+        <div class="right-panel retro-window" id="map-window">
+            <div class="retro-header">
+                <div class="retro-square"></div>
+                <div class="retro-lines"></div>
+            </div>
+            <!-- Container needs to be relative for Leaflet -->
+            <div id="map"></div>
+        </div>
+
+        <!-- History Window -->
+        <div id="history-window" class="retro-window hidden draggable-window" style="position: fixed; top: 15%; left: 40%; width: 380px; height: 550px; z-index: 9999; resize: both; overflow: hidden; min-width: 250px; min-height: 200px;">
+            <div class="retro-header history-header">
+                <div class="retro-square"></div>
+                <div class="retro-lines" style="margin-right: 10px;"></div>
+                <button id="btn-close-history" class="retro-close-btn" onclick="document.getElementById('history-window').classList.add('hidden')">&times;</button>
+            </div>
+            <div class="retro-content d-flex-col" style="padding: 20px;">
+                <h2 style="font-size: 2rem; margin-bottom: 20px; border-bottom: 4px solid #111; padding-bottom: 10px; font-family: 'Playfair Display', serif;">Discovery History</h2>
+                <div id="history-content" class="history-layout">
+                    <!-- History inject here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Overview Window -->
+        <div id="overview-window" class="retro-window hidden draggable-window" style="width: 500px; height: 650px; position: fixed; top: 10%; left: 30%; z-index: 10000; resize: both; overflow: hidden; min-width: 300px; min-height: 300px;">
+            <div class="retro-header overview-header" style="justify-content: flex-start; cursor: grab;">
+                <div class="retro-square"></div>
+                <div class="retro-lines" style="margin-right: 10px;"></div>
+                <button id="btn-close-overview" class="retro-close-btn" onclick="document.getElementById('overview-window').classList.add('hidden')">&times;</button>
+            </div>
+            <div class="retro-content d-flex-col" style="padding: 25px; overflow-y: auto;">
+                <div class="overview-badge" style="display: inline-block; padding: 4px 8px; background: #111; color: #f6f0e6; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; border: 2px solid #111;">CHI 2026 SUBMISSION</div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 5px; font-family: 'Playfair Display', serif; line-height: 1.1;">Camera T-1: Tangible Geo-Archival Exploration</h2>
+                <p style="font-size: 1.05rem; margin-bottom: 20px; font-weight: bold; border-bottom: 4px solid #111; padding-bottom: 15px;">A handheld device designed to bridge individual and collective memory.</p>
+                
+                <div class="overview-layout" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Image placeholder -->
+                    <div class="overview-image-container" style="border: 4px solid #111; background: #111; padding: 0;">
+                        <img src="assets/appareil.jpg" alt="Camera T-1 Device" class="overview-img" style="width: 100%; height: auto; object-fit: cover; display: block; filter: sepia(0.3) grayscale(0.5) contrast(1.2);" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'250\'><rect width=\'100%\' height=\'250\' fill=\'#333\'/><text x=\'50%\' y=\'50%\' fill=\'#fff\' font-family=\'monospace\' font-size=\'14\' text-anchor=\'middle\'>Image not found</text></svg>';">
+                    </div>
+                    <p style="font-size: 0.8rem; text-align: center; margin-top: -10px; font-style: italic;">(Add your image at <b>assets/appareil.jpg</b> in the file explorer)</p>
+
+                    <div class="overview-section" style="font-size: 0.95rem; line-height: 1.5;">
+                        <h3 style="margin-bottom: 8px; border-bottom: 2px solid #111; display: inline-block; padding-bottom: 2px;">Camera T-1</h3>
+                        <p>The Camera T-1 is a tangible device designed to "break the temporal frame" by fostering emotional engagement with historical environments.</p>
+                    </div>
+
+                    <div class="overview-section" style="font-size: 0.95rem; line-height: 1.5;">
+                        <h3 style="margin-bottom: 8px; border-bottom: 2px solid #111; display: inline-block; padding-bottom: 2px;">Core Concept: Temporal Exploration</h3>
+                        <p>The project aims to bridge individual and collective memory through an interactive, physical experience.</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li style="margin-bottom: 8px;"><strong>In-situ Retrieval:</strong> Users can rediscover past photographs of their current location through the camera's screen.</li>
+                            <li style="margin-bottom: 8px;"><strong>Archival Window:</strong> These images serve as "windows" into the lives of previous generations, offering a glimpse into how they experienced the world.</li>
+                            <li style="margin-bottom: 8px;"><strong>Database:</strong> It leverages an extensive database of over 19,000 photos of Paris, dating from 1850 to 2024.</li>
+                        </ul>
+                    </div>
+
+                    <div class="overview-section" style="font-size: 0.95rem; line-height: 1.5;">
+                        <h3 style="margin-bottom: 8px; border-bottom: 2px solid #111; display: inline-block; padding-bottom: 2px;">Technical Architecture</h3>
+                        <p>The device is a complete hardware-software system built for research and interactive demos.</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li style="margin-bottom: 8px;"><strong>Hardware Core:</strong> Integrated a Raspberry Pi 4 card with a camera module and an RGB touch screen.</li>
+                            <li style="margin-bottom: 8px;"><strong>Power Management:</strong> Engineered a robust power system using a TPS563200 to transform 7.4V from an 18650 battery holder into a stable 5V 3A.</li>
+                            <li style="margin-bottom: 8px;"><strong>Embedded Software:</strong> Developed a custom UI using Python (Tkinter) to manage real-time location data and Wi-Fi for image retrieval.</li>
+                            <li style="margin-bottom: 8px;"><strong>Physical Prototyping:</strong> Features a custom 3D-printed enclosure with tactile peripheral management like rotary encoders.</li>
+                        </ul>
+                    </div>
+
+                    <div class="overview-section" style="font-size: 0.95rem; line-height: 1.5;">
+                        <h3 style="margin-bottom: 8px; border-bottom: 2px solid #111; display: inline-block; padding-bottom: 2px;">Academic Context</h3>
+                        <p>This project is currently being developed for the CHI 2026 Student Research Competition.</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li style="margin-bottom: 8px;"><strong>Research Goal:</strong> Explore how tangible "time telescopes" can prompt empathy for the present environment.</li>
+                            <li style="margin-bottom: 8px;"><strong>SOTA Inspiration:</strong> Building upon related work such as Paragraphica (location-based generation) and Chronoscope (non-linear memory exploration).</li>
+                        </ul>
+                    </div>
+
+                    <div class="overview-section overview-sidebar" style="background: #e9e5db; border: 3px solid #111; padding: 15px; margin-top: 10px; font-size: 0.95rem;">
+                        <h3 style="margin-bottom: 12px; font-size: 1rem; text-transform: uppercase;">Technical Overview</h3>
+                        <ul class="tech-list" style="list-style: none; margin-left: 0;">
+                            <li style="display: flex; justify-content: space-between; border-bottom: 1px dotted #111; padding: 5px 0;"><span style="color:#555;">Core System</span><strong>Raspberry Pi 4</strong></li>
+                            <li style="display: flex; justify-content: space-between; border-bottom: 1px dotted #111; padding: 5px 0;"><span style="color:#555;">Display</span><strong>RGB Touch Screen</strong></li>
+                            <li style="display: flex; justify-content: space-between; border-bottom: 1px dotted #111; padding: 5px 0;"><span style="color:#555;">Input</span><strong>Rotary Encoders / Touch</strong></li>
+                            <li style="display: flex; justify-content: space-between; border-bottom: 1px dotted #111; padding: 5px 0;"><span style="color:#555;">Power</span><strong>Custom PCB (TPS563200)</strong></li>
+                            <li style="display: flex; justify-content: space-between; border-bottom: 1px dotted #111; padding: 5px 0;"><span style="color:#555;">Software</span><strong style="border-bottom: 2px solid #111;">Python / Tkinter</strong></li>
+                            <li style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="color:#555;">Dataset</span><strong>19k+ Archival Photos</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Modal spanning over the map -->
+        <div id="gallery-modal" class="retro-window hidden">
+            <div class="retro-header">
+                <div class="retro-square"></div>
+                <div class="retro-lines"></div>
+            </div>
+            <div class="retro-content d-flex-col">
+                <div class="gallery-header">
+                    <h2>Images Database</h2>
+                    <button id="btn-close-gallery">&times;</button>
+                </div>
+                <div id="gallery-content" class="grid-layout">
+                    <!-- Images inject here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/data.js?v=9"></script>
+    <script src="js/app.js?v=9"></script>
+</body>
+
+</html>
